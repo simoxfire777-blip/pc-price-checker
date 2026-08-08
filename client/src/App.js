@@ -439,44 +439,71 @@ function App() {
               </div>
             </form>
 
-            {response && (
-              <section className="mt-10 rounded-3xl border border-white/10 bg-surface2 p-6 shadow-lg shadow-black/10">
-                <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 className="text-2xl font-semibold text-white">Results</h2>
-                    <p className="text-sm text-muted">Pricing output is ready to be connected to marketplace data.</p>
-                  </div>
-                  <span className="rounded-full bg-accent/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-accent">{response.condition === 'new' ? 'New' : 'Used'}</span>
+            <section className="mt-10 rounded-3xl border border-white/10 bg-surface2 p-6 shadow-lg shadow-black/10">
+              <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">Results</h2>
+                  <p className="text-sm text-muted">Estimated market value for the submitted PC specifications.</p>
                 </div>
-
-                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="rounded-3xl bg-[#111827] p-5">
-                    <p className="text-sm uppercase tracking-[0.2em] text-muted">Estimated</p>
-                    <p className="mt-4 text-3xl font-semibold text-white">{response.estimatedPrice ?? 'N/A'}</p>
-                  </div>
-
-                  <div className="rounded-3xl bg-[#111827] p-5">
-                    <p className="text-sm uppercase tracking-[0.2em] text-muted">Lowest</p>
-                    <p className="mt-4 text-3xl font-semibold text-white">{response.lowestPrice ?? 'N/A'}</p>
-                  </div>
-
-                  <div className="rounded-3xl bg-[#111827] p-5">
-                    <p className="text-sm uppercase tracking-[0.2em] text-muted">Highest</p>
-                    <p className="mt-4 text-3xl font-semibold text-white">{response.highestPrice ?? 'N/A'}</p>
-                  </div>
-
-                  <div className="rounded-3xl bg-[#111827] p-5">
-                    <p className="text-sm uppercase tracking-[0.2em] text-muted">Average</p>
-                    <p className="mt-4 text-3xl font-semibold text-white">{response.averagePrice ?? 'N/A'}</p>
-                  </div>
+                <div>
+                  {loading && <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-accent">Calculating…</span>}
+                  {!loading && response && <span className="rounded-full bg-accent/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-accent">{response.condition === 'new' ? 'New' : 'Used'}</span>}
                 </div>
+              </div>
 
-                <div className="mt-6 rounded-3xl border border-white/10 bg-bg p-5 text-sm text-muted">
-                  <p>Comparable listings: <span className="font-semibold text-white">{response.comparableListings}</span></p>
-                  <p className="mt-2">{response.note}</p>
-                </div>
-              </section>
-            )}
+              {error && <div className="mb-4 rounded-3xl bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
+
+              {!loading && !response && !error && (
+                <div className="rounded-3xl border border-white/5 bg-[#0f1724] p-6 text-sm text-muted">Fill the form above and click <strong className="text-white">Check Market Value</strong> to see an estimate.</div>
+              )}
+
+              {loading && (
+                <div className="rounded-3xl p-6 bg-[#0b1220] text-center text-sm text-muted">Calculating estimate…</div>
+              )}
+
+              {response && (
+                <>
+                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 mt-4">
+                    <div className="rounded-3xl bg-[#111827] p-5">
+                      <p className="text-sm uppercase tracking-[0.2em] text-muted">Estimated</p>
+                      <p className="mt-4 text-3xl font-semibold text-white">{response.estimatedPrice ?? 'N/A'}</p>
+                    </div>
+
+                    <div className="rounded-3xl bg-[#111827] p-5">
+                      <p className="text-sm uppercase tracking-[0.2em] text-muted">Lowest</p>
+                      <p className="mt-4 text-3xl font-semibold text-white">{response.lowestPrice ?? 'N/A'}</p>
+                    </div>
+
+                    <div className="rounded-3xl bg-[#111827] p-5">
+                      <p className="text-sm uppercase tracking-[0.2em] text-muted">Highest</p>
+                      <p className="mt-4 text-3xl font-semibold text-white">{response.highestPrice ?? 'N/A'}</p>
+                    </div>
+
+                    <div className="rounded-3xl bg-[#111827] p-5">
+                      <p className="text-sm uppercase tracking-[0.2em] text-muted">Average</p>
+                      <p className="mt-4 text-3xl font-semibold text-white">{response.averagePrice ?? 'N/A'}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 rounded-3xl border border-white/10 bg-bg p-5 text-sm text-muted">
+                    <p>Comparable listings: <span className="font-semibold text-white">{response.comparableListings}</span></p>
+                    <p className="mt-2">{response.note}</p>
+                    <div className="mt-4 text-sm">
+                      <p className="font-semibold text-white">Specifications used</p>
+                      <ul className="mt-2 ml-4 list-disc text-white/90">
+                        <li>CPU: {response.cpu}</li>
+                        <li>GPU: {response.gpu}</li>
+                        <li>RAM: {response.ram}</li>
+                        <li>Storage: {response.storage}</li>
+                        <li>Motherboard: {response.motherboard}</li>
+                        <li>Power Supply: {response.powerSupply}</li>
+                        <li>Operating System: {response.operatingSystem}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </>
+              )}
+            </section>
           </>
         ) : (
           <div>
@@ -605,7 +632,7 @@ function App() {
         )}
       </div>
 
-      {selectedListing && (
+      {selectedListing?.id && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6">
           <div className="w-full max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-surface2 shadow-2xl shadow-black/50">
             <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-start sm:justify-between">

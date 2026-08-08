@@ -101,7 +101,7 @@ app.post('/api/price-estimate', (req, res) => {
     (pickPrice(cpu, cpuPrices, 330) + pickPrice(gpu, gpuPrices, 370) + ramValue + storageValue + motherboardValue + powerValue + osValue) * conditionFactor
   );
 
-  const formatPrice = (value) => `$${Number(value.toFixed(0)).toLocaleString()}`;
+  const formatPrice = (value) => `${Number(value.toFixed(0)).toLocaleString()} DH`;
 
   const result = {
     cpu,
@@ -116,6 +116,7 @@ app.post('/api/price-estimate', (req, res) => {
     lowestPrice: formatPrice(estimatedRaw * 0.88),
     highestPrice: formatPrice(estimatedRaw * 1.12),
     averagePrice: formatPrice(estimatedRaw),
+    estimatedRawValue: Math.round(estimatedRaw),
     comparableListings: Math.max(4, Math.round(8 + estimatedRaw / 220)),
     note: `Local estimate calculated from component values and condition; no external API key is required.`
   };
