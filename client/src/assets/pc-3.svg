@@ -1,0 +1,18 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06121f"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" rx="40" fill="url(#grad)"/>
+  <rect x="190" y="120" width="420" height="560" rx="40" fill="#111827" stroke="#34d399" stroke-width="18"/>
+  <rect x="760" y="180" width="190" height="520" rx="28" fill="#111827" stroke="#10b981" stroke-width="16"/>
+  <rect x="220" y="210" width="380" height="24" rx="12" fill="#1f2937"/>
+  <rect x="220" y="270" width="380" height="24" rx="12" fill="#1f2937"/>
+  <rect x="220" y="330" width="380" height="24" rx="12" fill="#1f2937"/>
+  <path d="M820 200 L960 200 L900 290 L820 290 Z" fill="#6ee7b7" opacity="0.85"/>
+  <circle cx="880" cy="420" r="30" fill="#34d399" opacity="0.95"/>
+  <text x="220" y="700" fill="#f8fafc" font-size="68" font-family="Inter, sans-serif" font-weight="700">RTX 4070 / Ryzen 7</text>
+  <text x="220" y="760" fill="#bbf7d0" font-size="38" font-family="Inter, sans-serif">Balanced gaming rig</text>
+</svg>

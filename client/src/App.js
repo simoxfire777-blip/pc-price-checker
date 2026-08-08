@@ -1,7 +1,28 @@
 import { useMemo, useState } from 'react';
 import axios from 'axios';
+import fallbackImage from './assets/fallback.svg';
+import pc1Image from './assets/pc-1.svg';
+import pc2Image from './assets/pc-2.svg';
+import pc3Image from './assets/pc-3.svg';
+import pc4Image from './assets/pc-4.svg';
+import pc5Image from './assets/pc-5.svg';
+import pc6Image from './assets/pc-6.svg';
+import pc7Image from './assets/pc-7.svg';
+import pc8Image from './assets/pc-8.svg';
+import pc9Image from './assets/pc-9.svg';
+import pc10Image from './assets/pc-10.svg';
+import pc11Image from './assets/pc-11.svg';
+import pc12Image from './assets/pc-12.svg';
 
 const apiBaseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '';
+
+const handleImageError = (event) => {
+  const target = event.currentTarget;
+  if (target.src !== fallbackImage) {
+    target.src = fallbackImage;
+    target.onError = null;
+  }
+};
 
 const fields = [
   { label: 'CPU', name: 'cpu', placeholder: 'e.g. Intel Core i7-13700K' },
@@ -32,7 +53,7 @@ const marketplaceListings = [
     condition: 'Used',
     rating: 4.9,
     date: '2026-08-01',
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=80',
+    image: pc1Image,
     description: 'A premium gaming rig optimized for 4K play and creative work.'
   },
   {
@@ -48,7 +69,7 @@ const marketplaceListings = [
     condition: 'Used',
     rating: 4.7,
     date: '2026-07-27',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80',
+    image: pc2Image,
     description: 'High-performance desktop for gaming and streaming with premium cooling.'
   },
   {
@@ -64,7 +85,7 @@ const marketplaceListings = [
     condition: 'New',
     rating: 4.8,
     date: '2026-08-05',
-    image: 'https://images.unsplash.com/photo-1587202372775-78b0a8be0e90?auto=format&fit=crop&w=900&q=80',
+    image: pc3Image,
     description: 'Ready-to-play PC with balanced power for modern games and productivity.'
   },
   {
@@ -80,7 +101,7 @@ const marketplaceListings = [
     condition: 'Used',
     rating: 4.6,
     date: '2026-07-30',
-    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80',
+    image: pc4Image,
     description: 'A strong workstation with fast CPU and GPU for gaming and design.'
   },
   {
@@ -96,7 +117,7 @@ const marketplaceListings = [
     condition: 'New',
     rating: 4.5,
     date: '2026-08-03',
-    image: 'https://images.unsplash.com/photo-1569421092238-2dd111a260de?auto=format&fit=crop&w=900&q=80',
+    image: pc5Image,
     description: 'Affordable midrange gaming build with strong 1080p performance.'
   },
   {
@@ -112,7 +133,7 @@ const marketplaceListings = [
     condition: 'Used',
     rating: 4.8,
     date: '2026-08-04',
-    image: 'https://images.unsplash.com/photo-1519741496346-f8d30cc493b7?auto=format&fit=crop&w=900&q=80',
+    image: pc6Image,
     description: 'Strong hybrid build with fast storage and powerful graphics.'
   },
   {
@@ -128,7 +149,7 @@ const marketplaceListings = [
     condition: 'Used',
     rating: 4.4,
     date: '2026-07-29',
-    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80',
+    image: pc7Image,
     description: 'A well-rounded secondhand rig with a solid Radeon GPU.'
   },
   {
@@ -144,7 +165,7 @@ const marketplaceListings = [
     condition: 'New',
     rating: 4.9,
     date: '2026-08-02',
-    image: 'https://images.unsplash.com/photo-1587202372775-78b0a8be0e90?auto=format&fit=crop&w=900&q=80',
+    image: pc8Image,
     description: 'Ultimate high-end rig built for 4K gaming and content creation.'
   },
   {
@@ -160,7 +181,7 @@ const marketplaceListings = [
     condition: 'Used',
     rating: 4.7,
     date: '2026-07-26',
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=80',
+    image: pc9Image,
     description: 'Solid all-rounder with excellent value and modern components.'
   },
   {
@@ -176,7 +197,7 @@ const marketplaceListings = [
     condition: 'New',
     rating: 4.6,
     date: '2026-08-06',
-    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80',
+    image: pc10Image,
     description: 'Great price for efficient gaming and everyday productivity.'
   },
   {
@@ -192,7 +213,7 @@ const marketplaceListings = [
     condition: 'New',
     rating: 4.95,
     date: '2026-08-07',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80',
+    image: pc11Image,
     description: 'Top-tier powerhouse for demanding creative workloads and premium gaming.'
   },
   {
@@ -208,7 +229,7 @@ const marketplaceListings = [
     condition: 'Used',
     rating: 4.3,
     date: '2026-07-25',
-    image: 'https://images.unsplash.com/photo-1569421092238-2dd111a260de?auto=format&fit=crop&w=900&q=80',
+    image: pc12Image,
     description: 'Compact and efficient gaming PC suitable for everyday use with a premium look.'
   }
 ];
@@ -540,7 +561,12 @@ function App() {
               {filteredListings.map((listing) => (
                 <article key={listing.id} className="overflow-hidden rounded-3xl border border-white/10 bg-[#111827] shadow-lg shadow-black/20">
                   <div className="relative overflow-hidden">
-                    <img src={listing.image} alt={listing.name} className="h-56 w-full object-cover transition duration-300 hover:scale-105" />
+                    <img
+                      src={listing.image || fallbackImage}
+                      alt={listing.name}
+                      onError={handleImageError}
+                      className="h-56 w-full object-cover transition duration-300 hover:scale-105"
+                    />
                     <div className="absolute left-4 top-4 rounded-full bg-black/75 px-4 py-2 text-xs uppercase tracking-[0.22em] text-white/90">{listing.condition}</div>
                   </div>
                   <div className="p-5">
@@ -598,7 +624,12 @@ function App() {
             <div className="border-t border-white/10 px-6 pb-6">
               <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
                 <div className="overflow-hidden rounded-3xl bg-black/50">
-                  <img src={selectedListing.image} alt={selectedListing.name} className="h-full w-full object-cover" />
+                  <img
+                    src={selectedListing.image || fallbackImage}
+                    alt={selectedListing.name}
+                    onError={handleImageError}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <div className="space-y-5">
                   <div className="grid gap-3 sm:grid-cols-2">
