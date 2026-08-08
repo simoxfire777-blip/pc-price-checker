@@ -7,6 +7,7 @@
     "server": "nodemon server/index.js --watch server",
     "client": "npm --prefix client start",
     "build": "npm --prefix client run build",
+    "postinstall": "npm --prefix client install",
     "start": "npm run build && npm run server"
   },
   "dependencies": {
