@@ -24,6 +24,111 @@ const handleImageError = (event) => {
   }
 };
 
+const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
+const parseNumber = (text) => {
+  const match = (text || '').toString().match(/([\d.]+)/);
+  return match ? Number(match[1]) : null;
+};
+
+const buildFallbackEstimate = ({ cpu, gpu, ram, storage, motherboard, powerSupply, operatingSystem, condition }) => {
+  const cpuPrices = [
+    { keyword: 'core i9', price: 600 },
+    { keyword: 'ryzen 9', price: 550 },
+    { keyword: 'core i7', price: 420 },
+    { keyword: 'ryzen 7', price: 380 },
+    { keyword: 'core i5', price: 280 },
+    { keyword: 'ryzen 5', price: 250 },
+    { keyword: 'core i3', price: 150 },
+    { keyword: 'ryzen 3', price: 130 }
+  ];
+
+  const gpuPrices = [
+    { keyword: 'rtx 4090', price: 1800 },
+    { keyword: 'rtx 4080', price: 1200 },
+    { keyword: 'rtx 4070', price: 700 },
+    { keyword: 'rtx 4060', price: 450 },
+    { keyword: 'rx 7900', price: 900 },
+    { keyword: 'rx 7800', price: 650 },
+    { keyword: 'rx 7700', price: 420 },
+    { keyword: 'gtx 1660', price: 190 },
+    { keyword: 'gtx 1650', price: 170 },
+    { keyword: 'radeon', price: 240 }
+  ];
+
+  const pickPrice = (text, list, fallback) => {
+    const value = normalizeText(text);
+    const match = list.find((item) => value.includes(item.keyword));
+    return match ? match.price : fallback;
+  };
+
+  const ramValue = (() => {
+    const amount = parseNumber(ram);
+    if (!amount) return 80;
+    if (amount >= 64) return 220;
+    if (amount >= 32) return 120;
+    if (amount >= 16) return 70;
+    return 40;
+  })();
+
+  const storageValue = (() => {
+    const amount = parseNumber(storage);
+    const lower = normalizeText(storage);
+    const isSsd = lower.includes('ssd') || lower.includes('nvme');
+    if (!amount) return 80;
+    if (amount >= 2000) return isSsd ? 280 : 120;
+    if (amount >= 1000) return isSsd ? 180 : 80;
+    if (amount >= 500) return isSsd ? 90 : 50;
+    return isSsd ? 50 : 30;
+  })();
+
+  const motherboardValue = (() => {
+    const value = normalizeText(motherboard);
+    if (value.includes('rog') || value.includes('strix') || value.includes('meg') || value.includes('aorus')) return 210;
+    if (value.includes('z790') || value.includes('x670') || value.includes('b650') || value.includes('z690') || value.includes('x570')) return 160;
+    return 110;
+  })();
+
+  const powerValue = (() => {
+    const amount = parseNumber(powerSupply);
+    if (!amount) return 60;
+    if (amount >= 1000) return 120;
+    if (amount >= 800) return 90;
+    if (amount >= 650) return 70;
+    return 50;
+  })();
+
+  const osValue = normalizeText(operatingSystem).includes('windows') ? 60 : 30;
+  const conditionFactor = condition === 'used' ? 0.82 : 1;
+
+  const estimatedRaw = Math.max(
+    120,
+    (pickPrice(cpu, cpuPrices, 330) + pickPrice(gpu, gpuPrices, 370) + ramValue + storageValue + motherboardValue + powerValue + osValue) * conditionFactor
+  );
+
+  const formatPrice = (value) => `${Number(value.toFixed(0)).toLocaleString()} DH`;
+
+  return {
+    cpu,
+    gpu,
+    ram,
+    storage,
+    motherboard,
+    powerSupply,
+    operatingSystem,
+    condition,
+    estimatedPrice: formatPrice(estimatedRaw),
+    lowestPrice: formatPrice(estimatedRaw * 0.88),
+    highestPrice: formatPrice(estimatedRaw * 1.12),
+    averagePrice: formatPrice(estimatedRaw),
+    comparableListings: Math.max(4, Math.round(8 + estimatedRaw / 220)),
+    note: 'Local estimate calculated from component values and condition; no external API key is required.'
+  };
+};
+
+const isValidScoreResponse = (data) => {
+  return data && typeof data === 'object' && typeof data.estimatedPrice === 'string' && typeof data.lowestPrice === 'string' && typeof data.highestPrice === 'string';
+};
+
 const fields = [
   { label: 'CPU', name: 'cpu', placeholder: 'e.g. Intel Core i7-13700K' },
   { label: 'GPU', name: 'gpu', placeholder: 'e.g. NVIDIA RTX 4070 Ti' },
@@ -280,11 +385,23 @@ function App() {
       condition: form.condition
     };
 
+    if (!apiBaseUrl) {
+      setError('Pricing API is not available in production. Showing a local estimate instead.');
+      setResponse(buildFallbackEstimate(payload));
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data } = await axios.post(`${apiBaseUrl}/api/price-estimate`, payload);
+      if (!isValidScoreResponse(data)) {
+        throw new Error('Received an invalid response from the pricing service.');
+      }
       setResponse(data);
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Unable to connect to pricing service.');
+      const userMessage = err.response?.data?.error || err.message || 'Unable to connect to pricing service.';
+      setError(userMessage);
+      setResponse(buildFallbackEstimate(payload));
     } finally {
       setLoading(false);
     }
